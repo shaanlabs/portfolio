@@ -1,0 +1,26 @@
+{
+  "featured": [
+    { "repo": "Voltix", "demoUrl": null, "pin": 1 },
+    { "repo": "yentrasetu", "demoUrl": null, "pin": 2 },
+    { "repo": "atomnext", "demoUrl": null, "pin": 3 },
+    { "repo": "Nextomic", "demoUrl": null, "pin": 4 },
+    { "repo": "VisionNetX", "demoUrl": null, "pin": 5 },
+    { "repo": "BookHive", "demoUrl": null, "pin": 6 }
+  ],
+  "staticProjects": [
+    {
+      "name": "City Traders ERP System",
+      "description": "Comprehensive ERP system for City Traders built with ERPNext & Frappe. Features custom modules, workflow automation, and integrated reporting with MariaDB backend.",
+      "language": "Python",
+      "stack": ["ERPNext", "Frappe", "Python", "JavaScript", "MariaDB"],
+      "isStatic": true
+    },
+    {
+      "name": "Tekista",
+      "description": "Flask-based web application with role-based access control (RBAC), comprehensive audit logging, and Docker containerization for deployment.",
+      "language": "Python",
+      "stack": ["Flask", "SQLite", "Shell", "Docker"],
+      "isStatic": true
+    }
+  ]
+}
