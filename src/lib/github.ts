@@ -114,11 +114,16 @@ export async function getProcessedRepos(): Promise<{
   for (const repo of allRepos) {
     const featuredEntry = pinnedMap.get(repo.name.toLowerCase());
 
+    let finalDemoUrl = featuredEntry?.demoUrl ?? repo.homepage ?? null;
+    if (repo.name.toLowerCase() === 'yentrasetu' && finalDemoUrl?.includes('yentrasetu.vercel.app')) {
+      finalDemoUrl = null;
+    }
+
     const processed: ProcessedRepo = {
       ...repo,
       isPinned: !!featuredEntry,
       pinOrder: featuredEntry?.pin ?? 999,
-      demoUrl: featuredEntry?.demoUrl ?? repo.homepage ?? null,
+      demoUrl: finalDemoUrl,
     };
 
     if (repo.fork) {
