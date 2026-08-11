@@ -1,11 +1,19 @@
+import React from "react";
 import type { Metadata } from "next";
-import { Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
+import { Bebas_Neue, Space_Grotesk, Inter, JetBrains_Mono } from "next/font/google";
 import "./globals.css";
 import Preloader from "@/components/Preloader";
 import CursorGlow from "@/components/CursorGlow";
 import ScrollProgress from "@/components/ScrollProgress";
 import BackToTop from "@/components/BackToTop";
 import CommandPalette from "@/components/CommandPalette";
+
+const bebasNeue = Bebas_Neue({
+  variable: "--font-display",
+  subsets: ["latin"],
+  weight: "400",
+  display: "swap",
+});
 
 const spaceGrotesk = Space_Grotesk({
   variable: "--font-heading",
@@ -26,25 +34,29 @@ const jetbrainsMono = JetBrains_Mono({
 });
 
 export const metadata: Metadata = {
-  title: "Shaanif Ahmed — Backend & Full-Stack Developer",
+  title: "Shaanif Ahmed — Backend Engineer & Data Scientist",
   description:
-    "Backend-focused developer with production experience in REST APIs, SaaS backends, and ERPNext/Frappe customizations. Open to full-time backend and full-stack roles.",
+    "Fresh grad. Backend Builder. Data nerd. Freelancer. Built 64+ projects across Python, Node.js, ERPNext & AI. Open to full-time roles — let's build something wild.",
   keywords: [
     "Shaanif Ahmed",
     "Backend Developer",
+    "Data Scientist",
     "Full-Stack Developer",
-    "Python",
+    "Python Developer",
     "Node.js",
     "ERPNext",
     "Django",
     "FastAPI",
     "Portfolio",
+    "Freelancer",
+    "Karnataka",
+    "India",
   ],
   authors: [{ name: "Shaanif Ahmed" }],
   openGraph: {
-    title: "Shaanif Ahmed — Backend & Full-Stack Developer",
+    title: "Shaanif Ahmed — Backend Engineer & Data Scientist",
     description:
-      "Backend-focused developer shipping REST APIs, SaaS backends, and ERP customizations. Actively seeking full-time roles.",
+      "Fresh grad. Backend Builder. Data nerd. Freelancer. Open to full-time roles.",
     type: "website",
     locale: "en_US",
     url: "https://shaanif.dev",
@@ -52,21 +64,17 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Shaanif Ahmed — Backend & Full-Stack Developer",
-    description:
-      "Backend-focused developer shipping REST APIs, SaaS backends, and ERP customizations.",
+    title: "Shaanif Ahmed — Backend Engineer & Data Scientist",
+    description: "Fresh grad. Backend Builder. Data nerd. Open to full-time roles.",
   },
-  robots: {
-    index: true,
-    follow: true,
-  },
+  robots: { index: true, follow: true },
 };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
     <html
       lang="en"
-      className={`${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} dark`}
+      className={`${bebasNeue.variable} ${spaceGrotesk.variable} ${inter.variable} ${jetbrainsMono.variable} dark`}
       suppressHydrationWarning
     >
       <head>
@@ -87,7 +95,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
           }}
         />
       </head>
-      <body className="min-h-screen font-body antialiased bg-background noise-overlay">
+      <body className={`min-h-screen font-body antialiased bg-background grain-overlay`}>
         <Preloader />
         <CursorGlow />
         <ScrollProgress />
@@ -101,7 +109,7 @@ export default function RootLayout({ children }: LayoutProps<"/">) {
               "@context": "https://schema.org",
               "@type": "Person",
               "name": "Shaanif Ahmed",
-              "jobTitle": "Backend & Full-Stack Developer",
+              "jobTitle": "Backend Engineer & Data Scientist",
               "url": "https://shaanif.dev",
               "sameAs": [
                 "https://github.com/shaanlabs",

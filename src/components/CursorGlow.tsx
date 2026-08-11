@@ -1,40 +1,26 @@
 'use client';
 
-import { useEffect, useState } from 'react';
-import { motion, useSpring, useMotionValue } from 'framer-motion';
+import { useEffect, useRef } from 'react';
 
 export default function CursorGlow() {
-  const [isMounted, setIsMounted] = useState(false);
-  
-  const cursorX = useMotionValue(-100);
-  const cursorY = useMotionValue(-100);
-  
-  const springConfig = { damping: 25, stiffness: 200, mass: 0.5 };
-  const smoothX = useSpring(cursorX, springConfig);
-  const smoothY = useSpring(cursorY, springConfig);
+  const glowRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
-    setIsMounted(true);
-    const moveCursor = (e: MouseEvent) => {
-      cursorX.set(e.clientX - 150);
-      cursorY.set(e.clientY - 150);
+    const handleMove = (e: MouseEvent) => {
+      if (glowRef.current) {
+        glowRef.current.style.left = `${e.clientX}px`;
+        glowRef.current.style.top = `${e.clientY}px`;
+      }
     };
-
-    window.addEventListener('mousemove', moveCursor);
-    return () => window.removeEventListener('mousemove', moveCursor);
-  }, [cursorX, cursorY]);
-
-  if (!isMounted) return null;
+    window.addEventListener('mousemove', handleMove, { passive: true });
+    return () => window.removeEventListener('mousemove', handleMove);
+  }, []);
 
   return (
-    <motion.div
-      className="fixed top-0 left-0 w-[300px] h-[300px] rounded-full pointer-events-none z-0 hidden md:block"
-      style={{
-        x: smoothX,
-        y: smoothY,
-        background: 'radial-gradient(circle, rgba(99, 102, 241, 0.15) 0%, rgba(6, 182, 212, 0.05) 50%, transparent 80%)',
-        filter: 'blur(40px)',
-      }}
+    <div
+      ref={glowRef}
+      className="cursor-glow pointer-events-none fixed z-0"
+      aria-hidden="true"
     />
   );
 }
