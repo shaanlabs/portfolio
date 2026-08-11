@@ -73,34 +73,37 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
     <section id="projects" className="py-24 relative">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 relative z-10">
         <ScrollReveal>
-          <div className="text-center mb-12">
-            <h2 className="font-heading text-3xl sm:text-4xl font-bold text-text-primary mb-4">
-              Project <span className="gradient-text">Catalog</span>
-            </h2>
-            <div className="w-16 h-1 bg-[image:var(--gradient-accent)] mx-auto rounded-full mb-4" />
-            <p className="text-text-secondary max-w-2xl mx-auto">
-              All {pinned.length + other.length} public repositories from GitHub, live and searchable.
-              Featured projects are pinned at the top.
-            </p>
+          <div className="section-label mb-4">Work & Projects</div>
+          <div className="flex flex-col sm:flex-row sm:items-end justify-between gap-6 mb-12">
+            <div>
+              <h2 className="font-heading text-4xl sm:text-5xl font-bold text-[var(--text-primary)]">
+                Selected Work
+              </h2>
+              <p className="text-[var(--text-secondary)] text-sm mt-2 max-w-md">
+                A showcase of key products, automations, and tools I&apos;ve built.
+              </p>
+            </div>
+            <div className="font-mono text-xs text-[var(--text-muted)]">
+              Showing {totalCount} projects
+            </div>
           </div>
         </ScrollReveal>
 
         {/* Search and Filters */}
         <ScrollReveal delay={0.1}>
-          <div className="mb-8 space-y-4">
+          <div className="mb-10 space-y-4">
             <div className="flex flex-col sm:flex-row gap-3">
               {/* Search */}
               <div className="relative flex-1">
-                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-text-muted" />
+                <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-4 h-4 text-[var(--text-muted)]" />
                 <input
                   type="text"
                   placeholder="Search projects..."
                   value={search}
                   onChange={(e) => setSearch(e.target.value)}
-                  className="w-full pl-11 pr-4 py-3 glass-card-static rounded-xl
-                             text-text-primary placeholder:text-text-muted text-sm
-                             focus:outline-none focus:border-accent/50 focus:shadow-[var(--shadow-glow)]
-                             transition-all duration-300"
+                  className="w-full pl-11 pr-4 py-3 bg-[var(--surface-hover)] border border-[var(--border)]
+                             text-[var(--text-primary)] placeholder:text-[var(--text-muted)] text-sm
+                             focus:outline-none focus:border-[var(--accent)] transition-all duration-300"
                 />
               </div>
 
@@ -108,7 +111,7 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
               <button
                 onClick={() => setShowFilters(!showFilters)}
                 className="sm:hidden flex items-center justify-center gap-2 px-4 py-3
-                           glass-card-static rounded-xl text-text-secondary
+                           border border-[var(--border)] text-[var(--text-secondary)]
                            text-sm transition-all duration-200"
               >
                 <Filter className="w-4 h-4" />
@@ -121,11 +124,8 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
                 <select
                   value={languageFilter}
                   onChange={(e) => setLanguageFilter(e.target.value)}
-                  className="px-4 py-3 glass-card-static rounded-xl
-                             text-text-secondary text-sm cursor-pointer
-                             focus:outline-none focus:border-accent/50 transition-all duration-300
-                             appearance-none"
-                  style={{ backgroundImage: 'none' }}
+                  className="px-4 py-3 bg-[var(--surface-hover)] border border-[var(--border)]
+                             text-[var(--text-secondary)] text-sm cursor-pointer focus:outline-none focus:border-[var(--accent)]"
                 >
                   <option value="all">All Languages</option>
                   {languages.map((lang) => (
@@ -138,11 +138,8 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
                 <select
                   value={sortBy}
                   onChange={(e) => setSortBy(e.target.value as SortKey)}
-                  className="px-4 py-3 glass-card-static rounded-xl
-                             text-text-secondary text-sm cursor-pointer
-                             focus:outline-none focus:border-accent/50 transition-all duration-300
-                             appearance-none"
-                  style={{ backgroundImage: 'none' }}
+                  className="px-4 py-3 bg-[var(--surface-hover)] border border-[var(--border)]
+                             text-[var(--text-secondary)] text-sm cursor-pointer focus:outline-none focus:border-[var(--accent)]"
                 >
                   <option value="updated">Recently Updated</option>
                   <option value="stars">Most Stars</option>
@@ -163,8 +160,7 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
                   <select
                     value={languageFilter}
                     onChange={(e) => setLanguageFilter(e.target.value)}
-                    className="flex-1 px-4 py-3 glass-card-static rounded-xl
-                               text-text-secondary text-sm appearance-none"
+                    className="flex-1 px-4 py-3 bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] text-sm"
                   >
                     <option value="all">All Languages</option>
                     {languages.map((lang) => (
@@ -176,8 +172,7 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
                   <select
                     value={sortBy}
                     onChange={(e) => setSortBy(e.target.value as SortKey)}
-                    className="flex-1 px-4 py-3 glass-card-static rounded-xl
-                               text-text-secondary text-sm appearance-none"
+                    className="flex-1 px-4 py-3 bg-[var(--surface-hover)] border border-[var(--border)] text-[var(--text-secondary)] text-sm"
                   >
                     <option value="updated">Updated</option>
                     <option value="stars">Stars</option>
@@ -186,35 +181,19 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
                 </motion.div>
               )}
             </AnimatePresence>
-
-            {/* Results count + forks toggle */}
-            <div className="flex items-center justify-between text-sm text-text-muted">
-              <span>
-                Showing {totalCount} project{totalCount !== 1 ? 's' : ''}
-              </span>
-              <button
-                onClick={() => setShowForks(!showForks)}
-                className="flex items-center gap-1.5 hover:text-accent transition-colors duration-300"
-              >
-                <GitFork className="w-3.5 h-3.5" />
-                {showForks ? 'Hide' : 'Show'} forked projects ({forked.length})
-              </button>
-            </div>
           </div>
         </ScrollReveal>
 
-        {/* Pinned/Featured projects */}
+        {/* Pinned/Featured projects (Rawahah Selected Work Card Grid Style) */}
         {filteredPinned.length > 0 && (
-          <div className="mb-12">
-            <h3 className="font-heading text-lg font-semibold text-text-secondary mb-6 flex items-center gap-2">
-              <span className="gradient-text">★</span> Featured Projects
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <div className="mb-16">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {filteredPinned.map((repo, i) => (
                 <ScrollReveal key={repo.id} delay={i * 0.08}>
                   <ProjectCard
                     repo={repo}
                     onClick={() => setSelectedRepo(repo)}
+                    index={i}
                     featured
                   />
                 </ScrollReveal>
@@ -223,81 +202,108 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
           </div>
         )}
 
-        {/* Other projects */}
-        {filteredOther.length > 0 && (
-          <div className="mb-12">
-            {filteredPinned.length > 0 && (
-              <h3 className="font-heading text-lg font-semibold text-text-secondary mb-6">
-                All Projects
-              </h3>
-            )}
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        {/* Other projects & static projects (Rawahah's Clean Table List View) */}
+        {(filteredOther.length > 0 || staticProjects.length > 0) && (
+          <div className="mb-16">
+            <ScrollReveal>
+              <div className="border-t border-[var(--border)] pt-12 mb-6">
+                <h3 className="font-heading text-xl font-bold text-[var(--text-primary)]">
+                  Other Projects &amp; Work
+                </h3>
+                <p className="text-[var(--text-secondary)] text-sm mt-1">
+                  A list of repositories, custom SaaS platforms and automation work.
+                </p>
+              </div>
+            </ScrollReveal>
+
+            <ul className="divide-y divide-[var(--border)] border-y border-[var(--border)]">
+              {/* GitHub Other Projects */}
               {filteredOther.map((repo, i) => (
-                <ScrollReveal key={repo.id} delay={Math.min(i * 0.05, 0.3)}>
-                  <ProjectCard
-                    repo={repo}
+                <ScrollReveal key={repo.id} delay={Math.min(i * 0.04, 0.2)}>
+                  <li
                     onClick={() => setSelectedRepo(repo)}
-                  />
-                </ScrollReveal>
-              ))}
-            </div>
-          </div>
-        )}
-
-        {/* Static projects (from resume, not on GitHub) */}
-        {staticProjects.length > 0 && (
-          <div className="mb-12">
-            <h3 className="font-heading text-lg font-semibold text-text-secondary mb-6">
-              Other Notable Work
-            </h3>
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-              {staticProjects.map((project, i) => (
-                <ScrollReveal key={project.name} delay={i * 0.08}>
-                  <div className="glass-card holo-shimmer rounded-2xl p-6">
-                    <h4 className="font-heading text-lg font-bold text-text-primary mb-2">
-                      {project.name}
-                    </h4>
-                    <p className="text-text-secondary text-sm leading-relaxed mb-4">
-                      {project.description}
-                    </p>
-                    <div className="flex flex-wrap gap-2">
-                      {project.stack.map((tech) => (
-                        <span
-                          key={tech}
-                          className="px-2.5 py-1 text-xs font-mono glass-card-static
-                                     text-text-muted rounded-md"
-                        >
-                          {tech}
-                        </span>
-                      ))}
+                    className="group grid grid-cols-1 md:grid-cols-12 gap-3 py-5 transition-colors duration-200 cursor-pointer hover:text-[var(--accent)]"
+                  >
+                    <div className="min-w-0 md:col-span-5">
+                      <h4 className="font-heading text-lg font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-tight">
+                        {repo.name}
+                      </h4>
+                      <p className="text-xs text-[var(--text-secondary)] mt-1 truncate">
+                        {repo.description || 'View source code on GitHub'}
+                      </p>
                     </div>
-                    <p className="mt-4 text-xs text-text-muted italic">
-                      Private repository — details from resume
-                    </p>
-                  </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:col-span-6 md:justify-between text-xs font-mono text-[var(--text-muted)]">
+                      <span className="tag-chip text-[10px]">{repo.language || 'Repository'}</span>
+                      <span>{new Date(repo.updated_at).getFullYear()}</span>
+                    </div>
+                    <span className="hidden md:block md:col-span-1 justify-self-end font-mono text-sm text-[var(--accent)] opacity-40 group-hover:translate-x-1 group-hover:opacity-100 transition-all">
+                      /
+                    </span>
+                  </li>
                 </ScrollReveal>
               ))}
-            </div>
+
+              {/* Resume Static Projects */}
+              {staticProjects.map((project, i) => (
+                <ScrollReveal key={project.name} delay={Math.min(i * 0.04, 0.2)}>
+                  <li
+                    className="group grid grid-cols-1 md:grid-cols-12 gap-3 py-5 hover:bg-[var(--surface-hover)] border-l-2 border-transparent hover:border-[var(--accent)] px-2 transition-all"
+                  >
+                    <div className="min-w-0 md:col-span-5">
+                      <h4 className="font-heading text-lg font-bold text-[var(--text-primary)] leading-tight">
+                        {project.name}
+                      </h4>
+                      <p className="text-xs text-[var(--text-secondary)] mt-1">
+                        {project.description}
+                      </p>
+                    </div>
+                    <div className="flex flex-wrap items-center gap-x-4 gap-y-2 md:col-span-6 md:justify-between text-xs font-mono text-[var(--text-muted)]">
+                      <div className="flex gap-1.5 flex-wrap">
+                        {project.stack.slice(0, 3).map(tech => (
+                          <span key={tech} className="tag-chip text-[9px]">{tech}</span>
+                        ))}
+                      </div>
+                      <span>Resume Archive</span>
+                    </div>
+                    <span className="hidden md:block md:col-span-1 justify-self-end font-mono text-xs text-[var(--text-muted)]">
+                      Private
+                    </span>
+                  </li>
+                </ScrollReveal>
+              ))}
+            </ul>
           </div>
         )}
 
-        {/* Forked projects */}
+        {/* Forks Toggle */}
+        {forked.length > 0 && (
+          <div className="flex justify-end text-sm text-[var(--text-muted)] mb-8">
+            <button
+              onClick={() => setShowForks(!showForks)}
+              className="flex items-center gap-1.5 hover:text-[var(--accent)] transition-colors"
+            >
+              <GitFork className="w-3.5 h-3.5" />
+              {showForks ? 'Hide' : 'Show'} forked repos ({forked.length})
+            </button>
+          </div>
+        )}
+
+        {/* Forked projects grid */}
         <AnimatePresence>
           {showForks && filteredForked.length > 0 && (
             <motion.div
               initial={{ opacity: 0, height: 0 }}
               animate={{ opacity: 1, height: 'auto' }}
               exit={{ opacity: 0, height: 0 }}
+              className="mb-16 overflow-hidden"
             >
-              <h3 className="font-heading text-lg font-semibold text-text-secondary mb-6 flex items-center gap-2">
-                <GitFork className="w-4 h-4" /> Forked Projects
-              </h3>
-              <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                {filteredForked.map((repo) => (
+              <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                {filteredForked.map((repo, i) => (
                   <ProjectCard
                     key={repo.id}
                     repo={repo}
                     onClick={() => setSelectedRepo(repo)}
+                    index={i}
                   />
                 ))}
               </div>
@@ -307,11 +313,8 @@ export default function Projects({ pinned, other, forked }: ProjectsProps) {
 
         {/* Empty state */}
         {allFiltered.length === 0 && !showForks && (
-          <div className="text-center py-16">
-            <p className="text-text-muted text-lg mb-2">No projects found</p>
-            <p className="text-text-muted text-sm">
-              Try adjusting your search or filter criteria
-            </p>
+          <div className="text-center py-16 font-mono text-xs text-[var(--text-muted)] border border-dashed border-[var(--border)]">
+            No projects matched search criteria.
           </div>
         )}
 

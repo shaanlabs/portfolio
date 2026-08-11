@@ -1,123 +1,115 @@
 'use client';
 
 import { motion } from 'framer-motion';
-import { Star, GitFork, Clock, ExternalLink } from 'lucide-react';
+import { ExternalLink } from 'lucide-react';
 import { ProcessedRepo } from '@/lib/types';
-import { getLanguageColor, formatDate } from '@/lib/github';
-import TiltCard from './TiltCard';
 
 interface ProjectCardProps {
   repo: ProcessedRepo;
   onClick: () => void;
+  index: number;
   featured?: boolean;
 }
 
 export default function ProjectCard({
   repo,
   onClick,
+  index,
   featured = false,
 }: ProjectCardProps) {
+  // Format the index (e.g. 01, 02)
+  const displayIndex = String(index + 1).padStart(2, '0');
+
+  // Guess / determine role & status
+  const role = repo.language === 'Python' || repo.language === 'Jupyter Notebook' 
+    ? 'Backend / Data Engineer' 
+    : 'Full-Stack Developer';
+  const status = repo.stargazers_count > 0 ? 'Live / Active' : 'Production';
+
   return (
-    <TiltCard maxTilt={6} className="h-full">
-      <motion.div
-        whileHover={{ y: -4 }}
-        transition={{ duration: 0.2 }}
+    <article className="h-full">
+      <div
         onClick={onClick}
-        className={`group cursor-pointer glass-card holo-shimmer rounded-2xl
-                    p-6 h-full flex flex-col
-                    ${featured
-                      ? 'border-accent/30 hover:border-accent/60 hover:shadow-[0_0_30px_rgba(99,102,241,0.15)]'
-                      : ''
-                    }`}
+        className="group cursor-pointer flex h-full flex-col border border-[var(--border)] hover:border-[var(--accent)] p-5 transition-all duration-300 relative"
       >
-      {/* Header */}
-      <div className="flex items-start justify-between gap-3 mb-3">
-        <div className="flex-1 min-w-0">
-          <div className="flex items-center gap-2">
-            {featured && (
-              <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase tracking-wider
-                             bg-accent/15 text-accent rounded-md border border-accent/20">
-                Featured
-              </span>
-            )}
-            {repo.fork && (
-              <span className="px-2 py-0.5 text-[10px] font-mono
-                             bg-text-muted/10 text-text-muted rounded-md">
-                Fork
-              </span>
-            )}
-          </div>
-          <h3 className="font-heading text-lg font-bold text-text-primary mt-1.5
-                         group-hover:text-accent transition-colors duration-300 truncate">
-            {repo.name}
-          </h3>
-        </div>
-        <ExternalLink className="w-4 h-4 text-text-muted opacity-0 group-hover:opacity-100
-                                 transition-all duration-300 flex-shrink-0 mt-1.5
-                                 group-hover:translate-x-0.5 group-hover:-translate-y-0.5" />
-      </div>
-
-      {/* Description */}
-      <p className="text-text-secondary text-sm leading-relaxed mb-4 line-clamp-3 flex-1">
-        {repo.description || 'No description available'}
-      </p>
-
-      {/* Topics */}
-      {repo.topics && repo.topics.length > 0 && (
-        <div className="flex flex-wrap gap-1.5 mb-4">
-          {repo.topics.slice(0, 4).map((topic) => (
-            <span
-              key={topic}
-              className="px-2 py-0.5 text-[11px] font-mono glass-card-static
-                         text-accent-secondary rounded-md"
-            >
-              {topic}
+        {/* Card Header Info */}
+        <div className="flex items-baseline justify-between gap-4 mb-4">
+          <div className="flex items-baseline gap-2">
+            <span className="font-mono text-xs text-[var(--accent)]">{displayIndex}</span>
+            <span className="font-mono text-[10px] uppercase tracking-widest text-[var(--text-muted)]">
+              {repo.language || 'Repository'}
             </span>
-          ))}
-          {repo.topics.length > 4 && (
-            <span className="px-2 py-0.5 text-[11px] text-text-muted">
-              +{repo.topics.length - 4}
+          </div>
+          {featured && (
+            <span className="font-mono text-[9px] uppercase bg-[var(--accent)] text-black px-1.5 py-0.5 font-bold">
+              Featured
             </span>
           )}
         </div>
-      )}
 
-      {/* Footer stats */}
-      <div className="flex items-center gap-4 text-xs text-text-muted pt-3 border-t border-border/50">
-        {/* Language */}
-        {repo.language && (
-          <div className="flex items-center gap-1.5">
-            <span
-              className="w-2.5 h-2.5 rounded-full ring-2 ring-white/10"
-              style={{ backgroundColor: getLanguageColor(repo.language) }}
-            />
-            <span>{repo.language}</span>
+        {/* Project Title */}
+        <h3 className="font-heading text-2xl font-bold text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors leading-tight">
+          {repo.name}
+        </h3>
+
+        {/* Editorial Project Cover Frame */}
+        <div className="aspect-[16/10] my-4 border border-[var(--border)] relative overflow-hidden bg-[var(--bg-alt)]">
+          {/* Subtle grid accent inside cover */}
+          <div className="absolute inset-0 grid-bg opacity-10" />
+          <div className="absolute inset-0 flex flex-col justify-between p-4">
+            <div className="flex items-baseline justify-between">
+              <span className="font-mono text-[10px] text-[var(--accent)]">{displayIndex}</span>
+              <span className="font-mono text-[9px] uppercase text-[var(--text-muted)] tracking-wider">
+                {repo.topics?.[0] || 'Source Code'}
+              </span>
+            </div>
+
+            {/* Simulated Project Mark Logo */}
+            <div className="self-center font-display text-4xl text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:scale-110 transition-all duration-300">
+              {repo.name.slice(0, 2).toUpperCase()}
+            </div>
+
+            {/* Meta Table at bottom of cover */}
+            <div className="grid grid-cols-3 gap-2 border-t border-[var(--border)] pt-3 text-[9px] font-mono">
+              <div>
+                <span className="text-[var(--text-muted)] block uppercase">Year</span>
+                <span className="text-[var(--text-secondary)] mt-0.5 block">{new Date(repo.updated_at).getFullYear()}</span>
+              </div>
+              <div className="truncate">
+                <span className="text-[var(--text-muted)] block uppercase">Role</span>
+                <span className="text-[var(--text-secondary)] mt-0.5 block truncate">{role}</span>
+              </div>
+              <div>
+                <span className="text-[var(--text-muted)] block uppercase">Status</span>
+                <span className="text-[var(--text-secondary)] mt-0.5 block">{status}</span>
+              </div>
+            </div>
           </div>
-        )}
+        </div>
 
-        {/* Stars */}
-        {repo.stargazers_count > 0 && (
-          <div className="flex items-center gap-1">
-            <Star className="w-3 h-3" />
-            <span>{repo.stargazers_count}</span>
-          </div>
-        )}
+        {/* Description */}
+        <p className="text-[var(--text-secondary)] text-sm leading-relaxed mb-4 flex-1 line-clamp-3">
+          {repo.description || 'No description available for this project. View code on GitHub to learn more.'}
+        </p>
 
-        {/* Forks */}
-        {repo.forks_count > 0 && (
-          <div className="flex items-center gap-1">
-            <GitFork className="w-3 h-3" />
-            <span>{repo.forks_count}</span>
-          </div>
-        )}
+        {/* Stack chips */}
+        <div className="flex flex-wrap gap-1.5 mb-4">
+          {repo.language && <span className="tag-chip text-[9px]">{repo.language}</span>}
+          {repo.topics?.slice(0, 2).map((topic) => (
+            <span key={topic} className="tag-chip text-[9px]">{topic}</span>
+          ))}
+        </div>
 
-        {/* Updated */}
-        <div className="flex items-center gap-1 ml-auto">
-          <Clock className="w-3 h-3" />
-          <span>{formatDate(repo.updated_at)}</span>
+        {/* Link Sweep Line */}
+        <div className="mt-auto pt-3 border-t border-[var(--border)] flex items-center justify-between">
+          <span className="font-mono text-[10px] uppercase tracking-wider text-[var(--text-primary)] group-hover:text-[var(--accent)] transition-colors underline-accent">
+            View Details
+          </span>
+          <span className="font-mono text-xs text-[var(--text-muted)] group-hover:text-[var(--accent)] group-hover:translate-x-1 transition-transform">
+            →
+          </span>
         </div>
       </div>
-    </motion.div>
-    </TiltCard>
+    </article>
   );
 }
