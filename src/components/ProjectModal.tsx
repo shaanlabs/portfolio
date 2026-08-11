@@ -3,6 +3,8 @@
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
 import { X, ExternalLink, Star, GitFork, Clock } from 'lucide-react';
+import ReactMarkdown from 'react-markdown';
+import remarkGfm from 'remark-gfm';
 import GitHubIcon from './icons/GitHubIcon';
 import { ProcessedRepo } from '@/lib/types';
 import { getLanguageColor, formatDate } from '@/lib/github';
@@ -36,23 +38,7 @@ export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
       })
         .then((res) => (res.ok ? res.text() : ''))
         .then((content) => {
-          // Remove Markdown headers, badges, etc.
-          const cleanText = content
-            .split('\n')
-            .filter(
-              (l) =>
-                l.trim() &&
-                !l.startsWith('#') &&
-                !l.startsWith('!') &&
-                !l.startsWith('---') &&
-                !l.startsWith('|') &&
-                !l.startsWith('[')
-            )
-            .join(' ');
-          const words = cleanText.split(/\s+/).slice(0, 100);
-          setReadmeExcerpt(
-            words.join(' ') + (words.length >= 100 ? '...' : '')
-          );
+          setReadmeExcerpt(content);
         })
         .catch(() => setReadmeExcerpt(''))
         .finally(() => setLoadingReadme(false));
@@ -184,10 +170,12 @@ export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
             {readmeExcerpt && (
               <div className="border-t border-[var(--border)] pt-8">
                 <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-4">
-                  04. Research Context (README)
+                  04. Research Context (README.md)
                 </span>
-                <div className="bg-[var(--bg-alt)] border border-[var(--border)] p-5 font-mono text-xs text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
-                  {readmeExcerpt}
+                <div className="bg-[var(--bg-alt)] border border-[var(--border)] p-6 font-mono text-xs text-[var(--text-secondary)] leading-relaxed overflow-x-auto max-h-[400px] overflow-y-auto prose prose-invert prose-xs max-w-none">
+                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                    {readmeExcerpt}
+                  </ReactMarkdown>
                 </div>
               </div>
             )}
