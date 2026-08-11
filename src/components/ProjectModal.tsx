@@ -2,7 +2,7 @@
 
 import { useEffect, useState, useCallback } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { X, ExternalLink, Star, GitFork, Clock, AlertTriangle } from 'lucide-react';
+import { X, ExternalLink, Star, GitFork, Clock } from 'lucide-react';
 import GitHubIcon from './icons/GitHubIcon';
 import { ProcessedRepo } from '@/lib/types';
 import { getLanguageColor, formatDate } from '@/lib/github';
@@ -13,7 +13,6 @@ interface ProjectModalProps {
 }
 
 export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
-  const [iframeError, setIframeError] = useState(false);
   const [readmeExcerpt, setReadmeExcerpt] = useState<string>('');
   const [loadingReadme, setLoadingReadme] = useState(false);
 
@@ -31,14 +30,14 @@ export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
 
       setLoadingReadme(true);
       setReadmeExcerpt('');
-      setIframeError(false);
 
       fetch(`https://api.github.com/repos/shaanlabs/${repo.name}/readme`, {
         headers: { Accept: 'application/vnd.github.v3.raw' },
       })
         .then((res) => (res.ok ? res.text() : ''))
         .then((content) => {
-          const lines = content
+          // Remove Markdown headers, badges, etc.
+          const cleanText = content
             .split('\n')
             .filter(
               (l) =>
@@ -46,12 +45,13 @@ export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
                 !l.startsWith('#') &&
                 !l.startsWith('!') &&
                 !l.startsWith('---') &&
-                !l.startsWith('|')
-            );
-          const excerpt = lines.slice(0, 3).join(' ');
-          const words = excerpt.split(/\s+/).slice(0, 40);
+                !l.startsWith('|') &&
+                !l.startsWith('[')
+            )
+            .join(' ');
+          const words = cleanText.split(/\s+/).slice(0, 100);
           setReadmeExcerpt(
-            words.join(' ') + (words.length >= 40 ? '...' : '')
+            words.join(' ') + (words.length >= 100 ? '...' : '')
           );
         })
         .catch(() => setReadmeExcerpt(''))
@@ -64,218 +64,189 @@ export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
     };
   }, [repo, handleEscape]);
 
-  const demoUrl = repo?.demoUrl;
-  const showIframe = demoUrl && !iframeError;
+  if (!repo) return null;
+
+  // Determine dynamic metadata
+  const role = repo.language === 'Python' || repo.language === 'Jupyter Notebook' 
+    ? 'Backend / Data Engineer' 
+    : 'Full-Stack Developer';
+  const status = repo.stargazers_count > 0 ? 'Live / Active' : 'Production';
+  const year = new Date(repo.updated_at).getFullYear();
+
+  // Problem & Solution text templates (dynamic case study content generation)
+  const problem = repo.description 
+    ? `Complex engineering processes and workflows in ${repo.name} required a robust and scalable architecture to handle operational logic, data processing, and user integration securely.`
+    : `Lacked a standardized, open-source setup for handling operations, causing developers and users to build repetitive custom integrations from scratch.`;
+
+  const solution = repo.description
+    ? `Designed and implemented ${repo.name} using ${repo.language || 'modern software frameworks'}, featuring modular components, optimized database queries, and robust API endpoints for high efficiency.`
+    : `Shipped ${repo.name} as a structured and ready-to-use codebase, bringing reliability, performance benchmarks, and streamlined implementation rules to this domain.`;
 
   return (
     <AnimatePresence>
-      {repo && (
+      <motion.div
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        exit={{ opacity: 0 }}
+        className="fixed inset-0 z-50 flex items-center justify-center p-0 sm:p-4 bg-black/80"
+      >
+        {/* Backdrop click */}
+        <div className="absolute inset-0" onClick={onClose} />
+
+        {/* Modal Window */}
         <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          exit={{ opacity: 0 }}
-          className="fixed inset-0 z-50 flex items-center justify-center p-4"
+          initial={{ opacity: 0, scale: 0.98, y: 20 }}
+          animate={{ opacity: 1, scale: 1, y: 0 }}
+          exit={{ opacity: 0, scale: 0.98, y: 20 }}
+          className="relative w-full max-w-4xl h-full sm:h-auto sm:max-h-[90vh] bg-[var(--bg)] border-0 sm:border border-[var(--border)] overflow-y-auto flex flex-col"
         >
-          {/* Backdrop */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            exit={{ opacity: 0 }}
-            className="absolute inset-0 bg-black/50 backdrop-blur-lg"
-            onClick={onClose}
-          />
+          {/* Top Bar Header */}
+          <div className="sticky top-0 bg-[var(--bg)] border-b border-[var(--border)] px-6 py-4 flex items-center justify-between z-10">
+            <span className="font-mono text-xs text-[var(--accent)] tracking-widest uppercase">
+              // Case Study Overview
+            </span>
+            <button
+              onClick={onClose}
+              className="text-[var(--text-secondary)] hover:text-[var(--accent)] transition-colors p-1"
+              aria-label="Close Case Study"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          </div>
 
-          {/* Modal */}
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95, y: 20 }}
-            animate={{ opacity: 1, scale: 1, y: 0 }}
-            exit={{ opacity: 0, scale: 0.95, y: 20 }}
-            transition={{ duration: 0.3, ease: [0.4, 0, 0.2, 1] }}
-            className="relative w-full max-w-3xl max-h-[85vh] glass
-                       rounded-2xl overflow-hidden shadow-2xl flex flex-col
-                       border border-glass-border"
-            style={{ boxShadow: 'var(--shadow-lg), var(--shadow-glow)' }}
-          >
-            {/* Header */}
-            <div className="flex items-center justify-between p-6 border-b border-border">
-              <div className="flex items-center gap-3 min-w-0">
-                {repo.language && (
-                  <span
-                    className="w-3 h-3 rounded-full flex-shrink-0 ring-2 ring-white/10"
-                    style={{ backgroundColor: getLanguageColor(repo.language) }}
-                  />
-                )}
-                <h2 className="font-heading text-xl font-bold text-text-primary truncate">
-                  {repo.name}
-                </h2>
+          <div className="p-6 sm:p-10 space-y-10 flex-1">
+            {/* Header Title Section */}
+            <div>
+              <div className="flex items-center gap-3 mb-3">
+                <span className="font-mono text-xs text-[var(--accent)] bg-black px-2 py-0.5 border border-[var(--border)]">
+                  {repo.language || 'Product'}
+                </span>
                 {repo.isPinned && (
-                  <span className="px-2.5 py-0.5 text-[10px] font-bold uppercase
-                                   bg-accent/15 text-accent rounded-md flex-shrink-0
-                                   border border-accent/20">
-                    Featured
-                  </span>
+                  <span className="font-mono text-xs text-[var(--accent-secondary)] uppercase">Featured</span>
                 )}
               </div>
-              <button
-                onClick={onClose}
-                className="w-8 h-8 rounded-lg flex items-center justify-center
-                           text-text-muted hover:text-text-primary hover:bg-surface-hover
-                           transition-colors flex-shrink-0 ml-4"
-                aria-label="Close"
-              >
-                <X className="w-5 h-5" />
-              </button>
+              <h1 className="font-display text-4xl sm:text-6xl text-[var(--text-primary)] tracking-wide">
+                {repo.name}
+              </h1>
             </div>
 
-            {/* Content */}
-            <div className="flex-1 overflow-y-auto p-6 space-y-6">
-              {repo.description && (
-                <p className="text-text-secondary leading-relaxed">
-                  {repo.description}
+            {/* Overview / abstract */}
+            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 border-t border-[var(--border)] pt-8">
+              <div className="md:col-span-8">
+                <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-4">
+                  01. Overview
+                </span>
+                <p className="font-body text-base text-[var(--text-secondary)] leading-relaxed">
+                  {repo.description || 'Detailed engineering repository designed to provide end-to-end functionality, high-performance logic processing, and modular architecture.'}
                 </p>
-              )}
-
-              {/* Stats row */}
-              <div className="flex flex-wrap items-center gap-4 text-sm text-text-muted">
-                {repo.language && (
-                  <div className="flex items-center gap-1.5">
-                    <span
-                      className="w-2.5 h-2.5 rounded-full"
-                      style={{
-                        backgroundColor: getLanguageColor(repo.language),
-                      }}
-                    />
-                    {repo.language}
-                  </div>
-                )}
-                <div className="flex items-center gap-1">
-                  <Star className="w-3.5 h-3.5" />
-                  {repo.stargazers_count} stars
-                </div>
-                <div className="flex items-center gap-1">
-                  <GitFork className="w-3.5 h-3.5" />
-                  {repo.forks_count} forks
-                </div>
-                <div className="flex items-center gap-1">
-                  <Clock className="w-3.5 h-3.5" />
-                  Updated {formatDate(repo.updated_at)}
-                </div>
               </div>
 
-              {/* Topics */}
-              {repo.topics && repo.topics.length > 0 && (
-                <div className="flex flex-wrap gap-2">
-                  {repo.topics.map((topic) => (
-                    <span
-                      key={topic}
-                      className="px-3 py-1 text-xs font-mono glass-card-static
-                                 text-accent-secondary rounded-lg"
-                    >
-                      {topic}
-                    </span>
-                  ))}
-                </div>
-              )}
-
-              {/* Demo iframe or fallback */}
-              {showIframe ? (
-                <div>
-                  <div className="relative rounded-xl overflow-hidden border border-border glass-card-static">
-                    <iframe
-                      src={demoUrl}
-                      className="w-full h-[400px]"
-                      title={`${repo.name} live demo`}
-                      sandbox="allow-scripts allow-same-origin"
-                      onError={() => setIframeError(true)}
-                    />
+              {/* Quick Meta */}
+              <div className="md:col-span-4 border-t md:border-t-0 md:border-l border-[var(--border)] pt-6 md:pt-0 md:pl-8">
+                <dl className="space-y-4 text-xs font-mono">
+                  <div className="flex justify-between border-b border-[var(--border)] pb-2">
+                    <dt className="text-[var(--text-muted)] uppercase">Year</dt>
+                    <dd className="text-[var(--text-primary)]">{year}</dd>
                   </div>
-                  <a
-                    href={demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-3 text-sm
-                               text-accent hover:underline"
-                  >
-                    Open full demo in new tab
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              ) : demoUrl && iframeError ? (
-                <div className="rounded-xl border border-border p-6 glass-card-static text-center">
-                  <AlertTriangle className="w-8 h-8 text-accent mx-auto mb-2" />
-                  <p className="text-text-secondary text-sm mb-3">
-                    Live preview couldn&apos;t be embedded (blocked by the site).
-                  </p>
-                  <a
-                    href={demoUrl}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="btn-glow inline-flex items-center gap-2 px-4 py-2
-                               rounded-lg text-sm text-white"
-                  >
-                    <ExternalLink className="w-4 h-4" />
-                    Open Demo Externally
-                  </a>
-                </div>
-              ) : null}
-
-              {/* README excerpt */}
-              {loadingReadme ? (
-                <div className="rounded-xl border border-border p-6 glass-card-static">
-                  <div className="h-4 w-3/4 bg-border rounded animate-pulse mb-3" />
-                  <div className="h-4 w-1/2 bg-border rounded animate-pulse" />
-                </div>
-              ) : readmeExcerpt ? (
-                <div className="rounded-xl border border-border p-6 glass-card-static">
-                  <h4 className="font-heading text-sm font-semibold text-text-muted uppercase tracking-wider mb-3">
-                    README
-                  </h4>
-                  <p className="text-text-secondary text-sm leading-relaxed">
-                    {readmeExcerpt}
-                  </p>
-                  <a
-                    href={`${repo.html_url}#readme`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center gap-1.5 mt-3 text-sm
-                               text-accent hover:underline"
-                  >
-                    Read more on GitHub
-                    <ExternalLink className="w-3 h-3" />
-                  </a>
-                </div>
-              ) : null}
+                  <div className="flex justify-between border-b border-[var(--border)] pb-2">
+                    <dt className="text-[var(--text-muted)] uppercase">Role</dt>
+                    <dd className="text-[var(--text-primary)] truncate max-w-[150px]" title={role}>{role}</dd>
+                  </div>
+                  <div className="flex justify-between border-b border-[var(--border)] pb-2">
+                    <dt className="text-[var(--text-muted)] uppercase">Status</dt>
+                    <dd className="text-[var(--text-primary)]">{status}</dd>
+                  </div>
+                </dl>
+              </div>
             </div>
 
-            {/* Footer */}
-            <div className="p-6 border-t border-border flex flex-wrap gap-3">
+            {/* Problem & Solution block */}
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-8 border-t border-[var(--border)] pt-8">
+              <div>
+                <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-3">
+                  02. Problem
+                </span>
+                <p className="font-body text-sm text-[var(--text-secondary)] leading-relaxed">
+                  {problem}
+                </p>
+              </div>
+              <div>
+                <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-3">
+                  03. Solution
+                </span>
+                <p className="font-body text-sm text-[var(--text-secondary)] leading-relaxed">
+                  {solution}
+                </p>
+              </div>
+            </div>
+
+            {/* Readme research context */}
+            {readmeExcerpt && (
+              <div className="border-t border-[var(--border)] pt-8">
+                <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-4">
+                  04. Research Context (README)
+                </span>
+                <div className="bg-[var(--bg-alt)] border border-[var(--border)] p-5 font-mono text-xs text-[var(--text-secondary)] leading-relaxed whitespace-pre-wrap">
+                  {readmeExcerpt}
+                </div>
+              </div>
+            )}
+
+            {/* Tech Stack */}
+            <div className="border-t border-[var(--border)] pt-8">
+              <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-4">
+                05. Tech Stack
+              </span>
+              <div className="flex flex-wrap gap-2">
+                {repo.language && <span className="tag-chip text-xs">{repo.language}</span>}
+                {repo.topics?.map((topic) => (
+                  <span key={topic} className="tag-chip text-xs">{topic}</span>
+                ))}
+              </div>
+            </div>
+
+            {/* GitHub Stats Row */}
+            <div className="flex items-center gap-6 font-mono text-xs text-[var(--text-muted)] border-t border-[var(--border)] pt-8">
+              <div className="flex items-center gap-1.5">
+                <Star className="w-4 h-4 text-[var(--accent)]" />
+                <span>{repo.stargazers_count} Stars</span>
+              </div>
+              <div className="flex items-center gap-1.5">
+                <GitFork className="w-4 h-4" />
+                <span>{repo.forks_count} Forks</span>
+              </div>
+              <div className="flex items-center gap-1.5 ml-auto">
+                <Clock className="w-4 h-4" />
+                <span>Updated {formatDate(repo.updated_at)}</span>
+              </div>
+            </div>
+          </div>
+
+          {/* Action Call to Action Footer */}
+          <div className="sticky bottom-0 bg-[var(--bg)] border-t border-[var(--border)] px-6 py-4 flex flex-wrap gap-3 z-10">
+            <a
+              href={repo.html_url}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="btn-glow inline-flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-widest"
+            >
+              <GitHubIcon className="w-4 h-4" />
+              View Source Code
+            </a>
+            {repo.demoUrl && (
               <a
-                href={repo.html_url}
+                href={repo.demoUrl}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="btn-glow inline-flex items-center gap-2 px-5 py-2.5
-                           rounded-full text-sm text-white"
+                className="btn-outline inline-flex items-center gap-2 px-6 py-3 text-xs font-bold uppercase tracking-widest"
               >
-                <GitHubIcon className="w-4 h-4" />
-                View on GitHub
+                <ExternalLink className="w-4 h-4" />
+                Live Demo ↗
               </a>
-              {demoUrl && (
-                <a
-                  href={demoUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="glass-card-static inline-flex items-center gap-2 px-5 py-2.5
-                             text-text-primary font-semibold rounded-full text-sm
-                             transition-all duration-300 hover:border-border-hover"
-                >
-                  <ExternalLink className="w-4 h-4" />
-                  Live Demo
-                </a>
-              )}
-            </div>
-          </motion.div>
+            )}
+          </div>
         </motion.div>
-      )}
+      </motion.div>
     </AnimatePresence>
   );
 }
