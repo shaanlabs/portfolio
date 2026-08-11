@@ -78,6 +78,7 @@ export default function FunZone({ allRepos }: FunZoneProps) {
                     <ProjectCard
                       repo={randomRepo}
                       onClick={() => setSelectedRepo(randomRepo)}
+                      index={0}
                     />
                   </motion.div>
                 )}

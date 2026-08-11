@@ -2,7 +2,9 @@
 
 import { useState } from 'react';
 import { motion } from 'framer-motion';
-import { Copy, Check, Mail, Github, Linkedin, ExternalLink } from 'lucide-react';
+import { Copy, Check, Mail, ExternalLink } from 'lucide-react';
+import Github from './icons/GitHubIcon';
+import Linkedin from './icons/LinkedInIcon';
 import ScrollReveal from './ScrollReveal';
 
 const SOCIALS = [
