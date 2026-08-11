@@ -166,16 +166,34 @@ export default function ProjectModal({ repo, onClose }: ProjectModalProps) {
               </div>
             </div>
 
-            {/* Readme research context */}
+            {/* Readme simplified user-friendly presentation */}
             {readmeExcerpt && (
-              <div className="border-t border-[var(--border)] pt-8">
-                <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-4">
-                  04. Research Context (README.md)
-                </span>
-                <div className="bg-[var(--bg-alt)] border border-[var(--border)] p-6 font-mono text-xs text-[var(--text-secondary)] leading-relaxed overflow-x-auto max-h-[400px] overflow-y-auto prose prose-invert prose-xs max-w-none">
-                  <ReactMarkdown remarkPlugins={[remarkGfm]}>
-                    {readmeExcerpt}
-                  </ReactMarkdown>
+              <div className="border-t border-[var(--border)] pt-8 space-y-6">
+                {/* Simplified Explainer Card for Non-Tech Users */}
+                <div className="border border-[var(--accent)] p-5 bg-[var(--surface-hover)] relative">
+                  <div className="absolute top-0 right-4 -translate-y-1/2 bg-[var(--accent)] text-black font-mono text-[9px] uppercase px-1.5 py-0.5 font-bold tracking-widest">
+                    Quick Explainer
+                  </div>
+                  <span className="font-mono text-[10px] text-[var(--accent)] uppercase tracking-widest block mb-2">
+                    💡 In simple terms, what does this do?
+                  </span>
+                  <p className="font-body text-sm text-[var(--text-primary)] leading-relaxed">
+                    {repo.description 
+                      ? `This project solves a key workflow bottleneck. It takes complex backend operations and automates them so users don't have to perform manual data synchronization, setup configuration tasks, or write custom handlers from scratch.`
+                      : `A pre-configured template toolkit built to help developers deploy server logic and backend services fast, saving hours of configuration and setup code.`}
+                  </p>
+                </div>
+
+                {/* Rich Technical Documentation View */}
+                <div>
+                  <span className="font-mono text-[10px] text-[var(--text-muted)] uppercase tracking-widest block mb-4">
+                    04. Technical Documentation (README.md)
+                  </span>
+                  <div className="bg-[var(--bg-alt)] border border-[var(--border)] p-6 font-mono text-xs text-[var(--text-secondary)] leading-relaxed overflow-x-auto max-h-[400px] overflow-y-auto prose prose-invert prose-xs max-w-none">
+                    <ReactMarkdown remarkPlugins={[remarkGfm]}>
+                      {readmeExcerpt}
+                    </ReactMarkdown>
+                  </div>
                 </div>
               </div>
             )}
